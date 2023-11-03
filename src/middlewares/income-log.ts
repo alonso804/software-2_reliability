@@ -38,7 +38,7 @@ const incomeLog = (req: Request, _res: Response, next: NextFunction): void => {
       throw new UnhaldeledHTTPMethodError(req.method);
   }
 
-  logger.info(log);
+  // logger.debug(log);
 
   next();
 };
