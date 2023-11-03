@@ -7,9 +7,10 @@ dotenv.config();
 
 const envVariablesSchema = z.object({
   PORT: z.string().regex(/^\d+$/).default('3000'),
-  MONGO_URI: z.string().url().default('mongodb://localhost:27017'),
+  MONGO_URI: z.string().url().default('mongodb://localhost:27017/anime'),
   REDIS_HOST: z.string().default('127.0.0.1'),
   REDIS_PORT: z.string().regex(/^\d+$/).default('6379'),
+  ANIME_URI: z.string().url().default('https://api.jikan.moe/v4'),
 });
 
 const parsedEnvVariables = envVariablesSchema.safeParse(process.env);
