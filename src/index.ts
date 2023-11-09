@@ -3,6 +3,7 @@ import './mongo';
 import 'express-async-errors';
 
 import express from 'express';
+import { consumeQueue } from './rabbitmq';
 
 import { logger } from './logger';
 import errorHandler from './middlewares/error-handler';
@@ -27,3 +28,5 @@ app.use(errorHandler);
 app.listen(port, () => {
   logger.debug(`Server started at http://localhost:${port}`);
 });
+
+consumeQueue();
