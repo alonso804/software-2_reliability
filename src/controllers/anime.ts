@@ -29,7 +29,7 @@ type Data<T> = {
   data: T;
 };
 
-const findByIdService = async ({ id }: { id: number }): Promise<{ message: string }> => {
+export const findByIdService = async ({ id }: { id: number }): Promise<{ message: string }> => {
   try {
     if (await AnimeModel.findOneById(id)) {
       return { message: `Anime [${id}] already exists` };
@@ -69,7 +69,7 @@ const findByIdService = async ({ id }: { id: number }): Promise<{ message: strin
   }
 };
 
-export const circuitBreaker = new CircuitBreaker(findByIdService);
+const circuitBreaker = new CircuitBreaker(findByIdService);
 
 class AnimeController {
   static async findById(req: Request, res: Response): Promise<Response> {

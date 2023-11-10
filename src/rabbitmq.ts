@@ -1,5 +1,5 @@
 import amqp from 'amqplib';
-import { circuitBreaker } from './controllers/anime';
+import { findByIdService } from './controllers/anime';
 
 const queueName = 'retry-queue';
 
@@ -20,7 +20,7 @@ async function consumeQueue() {
         try {
           const requestData = JSON.parse(message.content.toString());
   
-          const response = await circuitBreaker.fire(requestData);
+          const response = await findByIdService(requestData);
           console.log('Successfully processed message:', response);
   
           channel.ack(message);
