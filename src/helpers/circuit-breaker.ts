@@ -1,5 +1,6 @@
 import CircuitOpen from 'src/errors/circuit-open';
 import { logger } from 'src/logger';
+import { publishToQueue } from 'src/rabbitmq';
 
 const STATE = {
   OPENED: 'OPENED',
@@ -22,8 +23,8 @@ class CircuitBreaker {
   #state: State = STATE.CLOSED;
   #failureCount = 0;
   #failureThreshold = 5;
-  #resetAfter = 50000;
-  #timeout = 5000;
+  #resetAfter: number;
+  #timeout: number;
 
   constructor(request: Req, options?: Options) {
     this.#request = request;
@@ -36,7 +37,7 @@ class CircuitBreaker {
       this.#timeout = options.timeout;
     } else {
       this.#failureThreshold = 5;
-      this.#timeout = 5000; // in ms
+      this.#timeout = 1000; // in ms
     }
   }
 
@@ -60,7 +61,7 @@ class CircuitBreaker {
 
       return response;
     } catch (err) {
-      this.failure();
+      await this.failure(params);
 
       throw new CircuitOpen(
         `[X] Circuit is in open state right now. Please try again at ${new Date(
@@ -80,7 +81,8 @@ class CircuitBreaker {
     }
   }
 
-  failure(): void {
+  async failure(params: Record<string, unknown>): Promise<void> {
+    await publishToQueue(params);
     this.#failureCount += 1;
 
     if (this.#state === STATE.HALF || this.#failureCount >= this.#failureThreshold) {

@@ -4,7 +4,6 @@ import AnimeNotFound from 'src/errors/anime-not-found';
 import AxiosError from 'src/errors/axios-error';
 import CircuitBreaker from 'src/helpers/circuit-breaker';
 import AnimeModel from 'src/models/anime';
-import { publishToQueue } from 'src/rabbitmq';
 
 type ServerError = {
   code: number;
@@ -69,22 +68,15 @@ export const findByIdService = async ({ id }: { id: number }): Promise<{ message
   }
 };
 
-const circuitBreaker = new CircuitBreaker(findByIdService);
+export const circuitBreaker = new CircuitBreaker(findByIdService);
 
 class AnimeController {
   static async findById(req: Request, res: Response): Promise<Response> {
     const { id } = req.params;
 
-    try {
-      const response = await circuitBreaker.fire({ id: Number(id) });
-      return res.status(200).json(response);
-    } catch (error) {
-      const failedRequestData = { id: Number(id) };
-      await publishToQueue(failedRequestData);
-
-      return res.status(500).json({ error: 'Request failed and will be retried.' });
-    }
-  }  
+    const response = await circuitBreaker.fire({ id: Number(id) });
+    return res.status(200).json(response);
+  }
 }
 
 export default AnimeController;

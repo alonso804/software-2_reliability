@@ -3,12 +3,12 @@ import './mongo';
 import 'express-async-errors';
 
 import express from 'express';
-import { consumeQueue } from './rabbitmq';
 
 import { logger } from './logger';
 import errorHandler from './middlewares/error-handler';
 import incomeLog from './middlewares/income-log';
 import pathNotFound from './middlewares/path-not-found';
+import { consumeQueue } from './rabbitmq';
 import routes from './routes';
 
 const app = express();
